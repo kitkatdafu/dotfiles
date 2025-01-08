@@ -69,7 +69,7 @@
 (use-package doom-themes
   :ensure t
   :config
-  (load-theme 'doom-ayu-light t)
+  (load-theme 'doom-monokai-pro t)
   (doom-themes-visual-bell-config))
 
 (use-package doom-modeline
@@ -97,6 +97,39 @@
 (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
 (add-hook 'c-mode-hook 'eglot-ensure)
 (add-hook 'c++-mode-hook 'eglot-ensure)
+
+;;;; python mode ;;;;
+(use-package eglot
+  :ensure t
+  :defer t
+  :bind (:map eglot-mode-map
+              ("C-c C-d" . eldoc)
+              ("C-c C-e" . eglot-rename)
+              ("C-c C-o" . python-sort-imports)
+              ("C-c C-f" . eglot-format-buffer))
+  :hook ((python-mode . eglot-ensure)
+         (python-mode . flyspell-prog-mode)
+         (python-mode . superword-mode)
+         (python-mode . hs-minor-mode)
+         (python-mode . (lambda () (set-fill-column 80))))
+  :config
+  (setq-default eglot-workspace-configuration
+                '((:pylsp . (:configurationSources ["flake8"]
+                             :plugins (
+                                       :pycodestyle (:enabled :json-false)
+                                       :mccabe (:enabled :json-false)
+                                       :pyflakes (:enabled :json-false)
+                                       :flake8 (:enabled :json-false
+                                                :maxLineLength 88)
+                                       :ruff (:enabled t
+                                              :lineLength 88)
+                                       :pydocstyle (:enabled t
+                                                    :convention "numpy")
+                                       :yapf (:enabled :json-false)
+                                       :autopep8 (:enabled :json-false)
+                                       :black (:enabled t
+                                               :line_length 80
+                                               :cache_config t)))))))
 
 ;;;; company ;;;;
 (use-package company
